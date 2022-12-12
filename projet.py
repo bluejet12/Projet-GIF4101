@@ -109,6 +109,12 @@ X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_siz
 
 #C_list = [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000]
 #gamma_list = [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000]
+
+
+################################################################################
+# This block iterates on every possible combination of features and test an SVM on it. It takes several hours to complete
+# So keep that in mind if you uncomment it. The best result obtained was about 0.5 in test
+"""
 C_list = [0.001, 1, 1000]
 gamma_list = [0.001, 1, 1000]
 featureNumbers = np.arange(0, len(featureNames))
@@ -158,6 +164,9 @@ result_subset_test = np.array(result_subset_test)
 print(np.max(result_subset_train))
 print(np.max(result_subset_valid))
 print(np.max(result_subset_test))
+"""
+################################################################################
+
 """
 result_subset_train = []
 result_subset_valid = []
