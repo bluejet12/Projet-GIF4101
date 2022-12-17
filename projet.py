@@ -4,13 +4,17 @@ from matplotlib import pyplot as plt
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import minmax_scale
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import BaggingClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 import itertools
 
 tipsPercent = []
 featureNames = ["vendor_id", "passenger_count", "trip_distance", "rate_code", "payment_type", "extra", "mta_tax", "imp_surcharge", "tolls_amount", "pickup_location_id", "dropoff_location_id", "pickup_month", "pickup_day", "pickup_time", "dropoff_time"]
 
-nbDataToUse = 9000000 #max = 10 000 000
-#nbDataToUse = 1000
+nbDataToUse = 2000000 #max = 10 000 000
+#nbDataToUse = 2000
 
 data = np.zeros((nbDataToUse, len(featureNames)))
 
@@ -217,4 +221,183 @@ y = np.random.random(len(data))
 scatter = plt.scatter(data, y, cmap=plt.cm.Paired,\
         c=target)
 plt.show()
+"""
+
+
+
+
+
+#Construction multi layer perceptron Classifier
+
+#hyperparameter construct
+"""
+alpha_list =[1e-3, 1e-4, 1e-5, 1e-6]
+
+hidden_layer_sizes_list = np.arange(20,201,20)
+result_mlp_train = []
+result_mlp_valid = []
+result_mlp_test = []
+for i, feature in enumerate(featureNames):
+    X_train_feature = X_train[:,i].reshape(-1, 1)
+    X_valid_feature = X_valid[:,i].reshape(-1, 1)
+    X_test_feature = X_test[:,i].reshape(-1, 1)
+    train_mlp = []
+    test_mlp = []
+    valid_mlp = []
+
+    for alpha in alpha_list :
+        for count,hidden_layer_size in enumerate(hidden_layer_sizes_list):
+            
+    
+        
+            clf_mlp = MLPClassifier(hidden_layer_sizes=(hidden_layer_size,), alpha = alpha,max_iter = 500)                    
+            clf_mlp.fit(X_train_feature, y_train)
+                    
+            train_precision = clf_mlp.score(X_train_feature, y_train)
+            print(train_precision)
+            test_precision = clf_mlp.score(X_test_feature, y_test)
+            print(test_precision)
+            valid_precision = clf_mlp.score(X_valid_feature, y_valid)
+            print(valid_precision)
+
+            train_mlp.append(train_precision)
+            test_mlp.append(test_precision)
+            valid_mlp.append(valid_precision)
+
+
+    train_mlp = np.array(train_mlp)
+    test_mlp = np.array(test_mlp)
+    valid_mlp = np.array(valid_mlp)
+    result_mlp_train.append(np.max(train_mlp))
+    result_mlp_test.append(np.max(test_mlp))
+    result_mlp_valid.append(np.max(valid_mlp))
+
+
+print("\n"+"Resultat du perceptron multi couche" + "\n")
+for i, feature in enumerate(featureNames):
+    print(f"Résultats pour {feature}")
+    print(f"Train : {result_mlp_train[i]}")
+    print(f"Valid : {result_mlp_valid[i]}")
+    print(f"Test : {result_mlp_test[i]}")
+"""  
+
+
+
+
+#Bagging classsifier with defaut paramater for estimator (MLP,SVC,KNN and decision_tree) 
+"""
+result_bag_train = []
+result_bag_valid = []
+result_bag_test = []
+estimor_range = [2,4,6,8,10,12,14,16]
+
+clf_mlp = MLPClassifier(max_iter = 500)
+clf_svc = SVC( kernel="rbf")
+clf_KNN = KNeighborsClassifier()
+clf_dec = DecisionTreeClassifier()
+model = [clf_mlp,clf_svc,clf_KNN,clf_dec]
+
+
+for i, feature in enumerate(featureNames):
+    X_train_feature = X_train[:,i].reshape(-1, 1)
+    X_valid_feature = X_valid[:,i].reshape(-1, 1)
+    X_test_feature = X_test[:,i].reshape(-1, 1)
+    train_bag = []
+    test_bag = []
+    valid_bag = []
+    for estimator in model:
+        for n_estimor in estimor_range:
+                
+            clf = BaggingClassifier(base_estimator = estimator,n_estimators = n_estimor, random_state = 22)
+
+            clf.fit(X_train_feature, y_train)
+            train_precision = clf.score(X_train_feature, y_train)
+            
+            #print(train_precision)
+            test_precision = clf.score(X_test_feature, y_test)
+            #print(test_precision)
+            valid_precision = clf.score(X_valid_feature, y_valid)
+            #print(valid_precision)
+
+            train_bag.append(train_precision)
+            test_bag.append(test_precision)
+            valid_bag.append(valid_precision)
+                        
+    train_bag = np.array(train_bag)
+    test_bag = np.array(test_bag)
+    valid_bag = np.array(valid_bag)
+    result_bag_train.append(np.max(train_bag))
+    result_bag_test.append(np.max(test_bag))
+    result_bag_valid.append(np.max(valid_bag))
+
+   # print(result_subset_train)
+   # print(result_subset_valid)
+   # print(result_subset_test)               
+
+print("\n"+"Resultat du bagging" + "\n")
+for i, feature in enumerate(featureNames):
+    print(f"Résultats pour {feature}")
+    print(f"Train : {result_bag_train[i]}")
+    print(f"Valid : {result_bag_valid[i]}")
+    print(f"Test : {result_bag_test[i]}")
+"""
+
+
+
+#Construction Knn Classifier
+
+#hyperparameter construct
+
+"""
+result_knn_train = []
+result_knn_valid = []
+result_knn_test = []
+
+
+n_neighbors_range = [3,5,7,9,11,13,15]
+n_weights = ["uniform", "distance"]	
+
+for i, feature in enumerate(featureNames):
+    X_train_feature = X_train[:,i].reshape(-1, 1)
+    X_valid_feature = X_valid[:,i].reshape(-1, 1)
+    X_test_feature = X_test[:,i].reshape(-1, 1)
+    train_knn = []
+    test_knn = []
+    valid_knn = []
+
+    for n_neighbors in n_neighbors_range:
+        for weight in  n_weights:
+
+            clf_knn = KNeighborsClassifier(n_neighbors = n_neighbors, weights = weight)
+
+            clf_knn.fit(X_train_feature, y_train)
+            train_precision = clf_knn.score(X_train_feature, y_train)
+            
+            #print(train_precision)
+            test_precision = clf_knn.score(X_test_feature, y_test)
+            #print(test_precision)
+            valid_precision = clf_knn.score(X_valid_feature, y_valid)
+            #print(valid_precision)
+
+            train_knn.append(train_precision)
+            test_knn.append(test_precision)
+            valid_knn.append(valid_precision)
+
+
+
+
+    train_knn = np.array(train_knn)
+    test_knn = np.array(test_knn)
+    valid_knn = np.array(valid_knn)
+    result_knn_train.append(np.max(train_knn))
+    result_knn_test.append(np.max(test_knn))
+    result_knn_valid.append(np.max(valid_knn))
+
+print("\n"+"Resultat du Kppv" + "\n")
+for i, feature in enumerate(featureNames):
+    print(f"Résultats pour {feature}")
+    print(f"Train : {result_knn_train[i]}")
+    print(f"Valid : {result_knn_valid[i]}")
+    print(f"Test : {result_knn_test[i]}")
+
 """
